@@ -39,7 +39,7 @@ local defaultmapping = {
 for r,n in pairs(typingmapping) do defaultmapping[r] = n end
 -- godsense 0.02291165
 local nsense = 5.52192927
-local tsense = 0.37250605
+local tsense = 0.13730547
 
 --helppp
 local ninjastat = function()
@@ -86,6 +86,32 @@ local make_mapping = function(confunc, enable, enmap, disable, dismap)
 	end
 end
 
+local make_image = function(path, dest)
+	local this = nil
+
+	return function(enable)
+		if enable and not this then
+			this = waywall.image(path, dest)
+		elseif this and not enable then
+			this:close()
+			this = nil
+		end
+	end
+end
+
+local make_mirror = function(options)
+	local this = nil
+
+	return function(enable)
+		if enable and not this then
+			this = waywall.mirror(options)
+		elseif this and not enable then
+			this:close()
+			this = nil
+		end
+	end
+end
+
 local make_res = function(width, height, enable, disable)
 	return function()
 		local active_width, active_height = waywall.active_res()
@@ -101,17 +127,29 @@ local make_res = function(width, height, enable, disable)
 	end
 end
 
+local images = {
+}
+
+local mirrors = {
+	eye_measure = make_mirror({
+		src = { x = 155, y = 8177, w = 30, h = 30 },
+		dst = { x = 0, y = 165, w = 1110, h = 1110},
+	}),
+}
+
 local normal_sense = function()
+	mirrors.eye_measure(false)
 	waywall.set_sensitivity(nsense)
 end
 
-local tall_sense = function()
+local tall_enable = function()
+	mirrors.eye_measure(true)
 	waywall.set_sensitivity(tsense)
 end
 
 local resolutions = {
 	thin = make_res(340, 1080, normal_sense, normal_sense),
-	tall = make_res(340, 16384, tall_sense, normal_sense),
+	tall = make_res(340, 16384, tall_enable, normal_sense),
 	wide = make_res(2560, 340, normal_sense, normal_sense),
 }
 
@@ -140,8 +178,8 @@ local wrappedactions = {
 
 local wrapper = function(wrapped)
 	return function()
-		if TYPING_STATE then return end
-		return unpack(wrapped())
+		if TYPING_STATE then return false end
+		return wrapped()
 	end
 end
 
