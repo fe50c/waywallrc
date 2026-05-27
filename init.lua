@@ -43,7 +43,7 @@ local tsense = 0.13730547
 
 --helppp
 local ninjastat = function()
-	local handle = io.popen("pgrep -f 'Ninjabrain.*jar'")
+	local handle = io.popen("pgrep -P $(ps -o ppid= $$) -f 'Ninjabrain.*jar'")
 	if not handle then return nil end
 	local result = handle:read("*l")
 	handle:close()
