@@ -1,0 +1,9 @@
+version:100
+autoJump:false
+mouseSensitivity:0.02291165
+fov:1.0
+gamma:5.0
+maxFps:150
+narrator:0
+advancedItemTooltips:true
+rawMouseInput:false
